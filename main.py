@@ -1,4 +1,5 @@
-from preprocessing import preprocess
+from preprocessing import *
+import random
 
 def main():
     training_dataset = preprocess.load_images_from_folder("data/training")

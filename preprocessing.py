@@ -15,6 +15,7 @@ class preprocess:
                 images.append(img)
         return images
 
+
     # The following function obtains the captha lable for the file name.
     def get_captha_lable(folder):
         lables = []
@@ -24,6 +25,15 @@ class preprocess:
             lables.append(lable)
         return lables
 
+    # remove noise with the help of contourArea
+    def remove_noise(opening):
+        cnts = cv2.findContours(opening, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
+        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+        for c in cnts:
+            area = cv2.contourArea(c)
+            if area < 10:
+                cv2.drawContours(opening, [c], -1, (0,0,0), -1)
+        return 255 - opening
 
     # This function performs KNearestNeighborClassifier on preprocessed image.
     def Classifier(images,lables):
@@ -39,21 +49,19 @@ class preprocess:
         print(lables)
         print('Training accuracy score: %.3f' % knn.score(d2_train_dataset, lables))
         
-
     # The following function transforms the captha image into black and white image.
     def preprocess(image):
         # convert the image to grayscale format 
         imgray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        thresh = cv2.adaptiveThreshold(imgray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,23)
+        imgrayblur = cv2.GaussianBlur(imgray, (3,3), 0)
+        thresh = cv2.adaptiveThreshold(imgrayblur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,23)
         # make monorom
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
         opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
-        # remove noise with the help of contourArea
-        cnts = cv2.findContours(opening, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
-        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-        for c in cnts:
-            area = cv2.contourArea(c)
-            if area < 10:
-                cv2.drawContours(opening, [c], -1, (0,0,0), -1)
-        return opening
-
+        image = remove_noise(opening)
+        x,y,w,h = cv2.boundingRect(image)
+        print("x = {}, y = {}, w = {}, h = {}".format(x,y,w,h))
+        image = image[y:y+h,x:x+w]
+        cv2.imshow('thresh',image)
+        cv2.waitKey(0)
+        # return result,opening

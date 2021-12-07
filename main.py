@@ -38,12 +38,13 @@ def preprocess(image):
         if area < 10:
             cv2.drawContours(opening, [c], -1, (0,0,0), -1)
     result = 255 - opening
-
-    return result,opening
+    cv2.imshow('thresh',result)
+    cv2.waitKey(0)
+    # return result,opening
 
 def main():
     training_dataset = load_images_from_folder("data/training")
     training_lables = get_captha_lable("data/training")
-    preprocess(training_dataset)
+    preprocess(training_dataset[0])
 if __name__ == "__main__":
     main()

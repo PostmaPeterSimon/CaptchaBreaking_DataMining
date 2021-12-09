@@ -56,10 +56,11 @@ def preprocess(image, blur, standard_image_height):
     ret,tresh = cv2.threshold(imgrayblur, 0, 255, cv2.THRESH_OTSU)
     noise_removed = remove_noise(tresh)
     
-    kernel = np.ones((5,5),np.uint8)
-    dilation = cv2.dilate(noise_removed,kernel,iterations = 1)
+    dilation_kernel = np.ones((7,7),np.uint8)
+    erosion_kernel = np.ones((5,5),np.uint8)
+    dilation = cv2.dilate(noise_removed,dilation_kernel,iterations = 1)
     cv2.imshow("dilation", dilation)
-    erosion = cv2.erode(dilation,kernel,iterations = 1)
+    erosion = cv2.erode(dilation,erosion_kernel,iterations = 1)
     
     cropped_image = crop_image(erosion)
     end_image = resize_image(cropped_image, standard_image_height)

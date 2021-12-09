@@ -70,14 +70,16 @@ def preprocess(image, blur, standard_image_height):
 
 def determineTrainingData(image):
     ret, bw_img = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
-    cnts = cv2.findContours(bw_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cv2.imshow("ima",bw_img)
+    cv2.waitKey()
+    cnts = cv2.findContours(bw_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #Tune cv2 parameters
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
     cnts, _ = contours.sort_contours(cnts, method="left-to-right")
 
     ROI_number = 0
     for c in cnts:
         area = cv2.contourArea(c)
-        if area > 10:
+        if area > 1000 and area < 5000: #add the right area values
             x,y,w,h = cv2.boundingRect(c)
             ROI = 255 - image[y:y+h, x:x+w]
             cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)

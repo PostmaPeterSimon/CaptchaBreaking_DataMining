@@ -1,4 +1,5 @@
 from preprocessing import *
+from prediction import *
 import random
 
 def main():
@@ -12,5 +13,7 @@ def main():
                 #Execute Test data
                 score.append(predit_Captha(test_dataset,test_lables,model))
     print(score)
+
+    
 if __name__ == "__main__":
     main()

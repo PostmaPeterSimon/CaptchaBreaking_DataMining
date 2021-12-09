@@ -1,5 +1,6 @@
 import numpy as np
 from preprocessing import *
+from sklearn.neighbors import KNeighborsClassifier
 
 # This function performs KNearestNeighborClassifier on preprocessed image.
 def Classifier(images,lables,a_metric):

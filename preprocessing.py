@@ -1,8 +1,8 @@
 from PIL.Image import NONE
 import cv2
 import os
-from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
+from imutils import contours
 
 # The following function reads the folder with images.
 def load_images_from_folder(folder):
@@ -58,13 +58,28 @@ def preprocess(image, blur, standard_image_height):
     
     kernel = np.ones((5,5),np.uint8)
     dilation = cv2.dilate(noise_removed,kernel,iterations = 1)
-    cv2.imshow("dilation", dilation)
+    # cv2.imshow("dilation", dilation)
     erosion = cv2.erode(dilation,kernel,iterations = 1)
     
     cropped_image = crop_image(erosion)
     end_image = resize_image(cropped_image, standard_image_height)
-    cv2.imshow('end_image', end_image)
-    cv2.waitKey(0)
+    # cv2.imshow('end_image', end_image)
+    # cv2.waitKey(0)
+    determineTrainingData(end_image)
     return end_image
 
+def determineTrainingData(image):
+    ret, bw_img = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+    cnts = cv2.findContours(bw_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+    cnts, _ = contours.sort_contours(cnts, method="left-to-right")
 
+    ROI_number = 0
+    for c in cnts:
+        area = cv2.contourArea(c)
+        if area > 10:
+            x,y,w,h = cv2.boundingRect(c)
+            ROI = 255 - image[y:y+h, x:x+w]
+            cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)
+            cv2.rectangle(image, (x, y), (x + w, y + h), (36,255,12), 2)
+            ROI_number += 1

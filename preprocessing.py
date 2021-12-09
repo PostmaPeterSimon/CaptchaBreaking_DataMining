@@ -22,28 +22,49 @@ def get_captha_lable(folder):
         lables.append(lable)
     return lables
 
+def resize_image(image, height):
+    scale_percent =  image.shape[0] / height
+    width = int(image.shape[1] / scale_percent)
+    dsize = (width, height)
+    print("origional width, height :{}, {}".format(image.shape[1], image.shape[0]))
+    print(dsize)
+    image = cv2.resize(image, dsize)
+    return image
+
+def crop_image(image):
+        x,y,w,h = cv2.boundingRect(image)
+        image = image[y:y+h,x:x+w]
+        return image
+
     # remove noise with the help of contourArea
-def remove_noise(opening):
-    cnts = cv2.findContours(opening, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
+def remove_noise(image):
+    cnts = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
     for c in cnts:
         area = cv2.contourArea(c)
         if area < 10:
-            cv2.drawContours(opening, [c], -1, (0,0,0), -1)
-    return 255 - opening
+            cv2.drawContours(image, [c], -1, (0,0,0), -1)
+    return image
 
 # The following function transforms the captha image into black and white image.
-def preprocess(image):
+def preprocess(image, blur, standard_image_height):
+    image = resize_image(image, standard_image_height)
+
     # convert the image to grayscale format 
     imgray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    imgrayblur = cv2.GaussianBlur(imgray, (3,3), 0)
-    thresh = cv2.adaptiveThreshold(imgrayblur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,23)
-    # make monorom
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
-    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
-    image = remove_noise(opening)
-    x,y,w,h = cv2.boundingRect(image)
-    # print("x = {}, y = {}, w = {}, h = {}".format(x,y,w,h))
-    image = image[y:y+h,x:x+w]
-    return opening
+    imgrayblur = cv2.GaussianBlur(imgray, blur, 0)
+    ret,tresh = cv2.threshold(imgrayblur, 0, 255, cv2.THRESH_OTSU)
+    noise_removed = remove_noise(tresh)
     
+    kernel = np.ones((5,5),np.uint8)
+    dilation = cv2.dilate(noise_removed,kernel,iterations = 1)
+    cv2.imshow("dilation", dilation)
+    erosion = cv2.erode(dilation,kernel,iterations = 1)
+    
+    cropped_image = crop_image(erosion)
+    end_image = resize_image(cropped_image, standard_image_height)
+    cv2.imshow('end_image', end_image)
+    cv2.waitKey(0)
+    return end_image
+
+

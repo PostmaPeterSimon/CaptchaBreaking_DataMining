@@ -68,4 +68,3 @@ def preprocess(image, blur, standard_image_height):
     cv2.waitKey(0)
     return end_image
 
-

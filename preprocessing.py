@@ -62,10 +62,24 @@ def preprocess(image, image_height, blur, dilation_kernel, erosion_kernel):
     erosion = cv2.erode(dilation, erosion_kernel, iterations = 1)
     
 
-    cropped_image = crop_image(remove_noise(erosion))
+    cropped_image = crop_image(255-remove_noise(erosion))
     end_image = resize_image(cropped_image, image_height)
     determineTrainingData(end_image)
+    cv2.imshow("image",end_image)
+    cv2.waitKey(0)
     return end_image
+
+
+def split_multiple_characters(image,c,ROI_number, n_characters):
+    x,y,w,h = cv2.boundingRect(c)
+    split_width = w//n_characters
+    for split in range(0,n_characters):
+        split_index = x + split * split_width
+        ROI = image[y:y+h, split_index : split_index + split_width]
+        cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)
+        ROI_number += 1
+    return ROI_number
+
 
 def determineTrainingData(image):
     cnts = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #Tune cv2 parameters
@@ -76,7 +90,9 @@ def determineTrainingData(image):
     for c in cnts:
         area = cv2.contourArea(c)
         if area > 1000 and area < 4700: #add the right area values
-            x,y,w,h = cv2.boundingRect(c)
-            ROI = 255 - image[y:y+h, x:x+w]
-            cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)
-            ROI_number +=1
+            if area > 4000:
+                ROI_number = split_multiple_characters(image,c,ROI_number,3)
+            elif area > 1800:
+                ROI_number = split_multiple_characters(image,c,ROI_number,2)
+            else:
+                ROI_number = split_multiple_characters(image,c,ROI_number,1)

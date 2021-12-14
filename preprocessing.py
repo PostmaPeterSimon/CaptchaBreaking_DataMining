@@ -48,8 +48,10 @@ def remove_noise(image):
     return image
 
 # The following function transforms the captha image into black and white image.
-def preprocess(image, blur, standard_image_height):
-    image = resize_image(image, standard_image_height)
+def preprocess(image, image_height, blur, dilation_kernel, erosion_kernel):
+    #dilation kernel must of cv::MorphShapes 
+    image = resize_image(image, image_height)
+    cv2.imshow('origional', image)
 
     # convert the image to grayscale format 
     imgray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -57,14 +59,15 @@ def preprocess(image, blur, standard_image_height):
     ret,tresh = cv2.threshold(imgrayblur, 0, 255, cv2.THRESH_OTSU)
     noise_removed = remove_noise(tresh)
     
-    dilation_kernel = np.ones((7,7),np.uint8)
-    erosion_kernel = np.ones((5,5),np.uint8)
-    dilation = cv2.dilate(noise_removed,dilation_kernel,iterations = 1)
-    erosion = cv2.erode(dilation,erosion_kernel,iterations = 1)
+    dilation = cv2.dilate(noise_removed, dilation_kernel, iterations = 1)
+    cv2.imshow("dilation", dilation)
+    erosion = cv2.erode(dilation, erosion_kernel, iterations = 1)
     
-    cropped_image = crop_image(erosion)
-    end_image = resize_image(cropped_image, standard_image_height)
-    determineTrainingData(end_image)
+
+    cropped_image = crop_image(remove_noise(erosion))
+    end_image = resize_image(cropped_image, image_height)
+    cv2.imshow('end_image', end_image)
+    cv2.waitKey(0)
     return end_image
 
 def determineTrainingData(image):

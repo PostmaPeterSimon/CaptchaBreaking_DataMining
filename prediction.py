@@ -15,7 +15,7 @@ def Classifier(images,lables,a_metric):
     knn.fit(d2_train_dataset,lables)
     return knn
 
-def predit_Captha(images,lables,knn):
+def predict_Captha(images,lables,knn):
     preProcessedImages = []
     for image in images:
         preProcessedImages.append(preprocess(image))

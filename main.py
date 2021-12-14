@@ -16,7 +16,7 @@ def main():
     # print(score)
 
     # preprocess(random.choice(training_dataset))
-    preprocess(random.choice(training_dataset), blur=(5,5), standard_image_height=100)
+    preprocess(training_dataset[0], blur=(5,5), standard_image_height=100)
 
 
 

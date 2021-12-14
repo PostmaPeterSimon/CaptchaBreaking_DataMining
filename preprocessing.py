@@ -75,7 +75,8 @@ def determineTrainingData(image):
     ROI_number = 0
     for c in cnts:
         area = cv2.contourArea(c)
-        if area > 1000 and area < 2000: #add the right area values
+        if area > 1000 and area < 3600: #add the right area values
             x,y,w,h = cv2.boundingRect(c)
             ROI = 255 - image[y:y+h, x:x+w]
             cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)
+            ROI_number +=1

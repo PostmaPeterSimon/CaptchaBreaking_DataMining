@@ -12,11 +12,13 @@ def main():
     # for metric in ["euclidean", "minkowski", "manhattan", "seuclidean"]: #"seuclidean"
     #             model = Classifier(training_dataset,training_lables,metric)
     #             #Execute Test data
-    #             score.append(predit_Captha(test_dataset,test_lables,model))
+    #             score.append(predict_Captha(test_dataset,test_lables,model))
     # print(score)
 
     # preprocess(random.choice(training_dataset))
-    preprocess(random.choice(training_dataset), blur=(5,5), standard_image_height=100)
+    erosion_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    dilation_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+    preprocess(image=random.choice(training_dataset), image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
 
 
 

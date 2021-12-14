@@ -76,7 +76,7 @@ def split_multiple_characters(image,c,ROI_number, n_characters):
     for split in range(0,n_characters):
         split_index = x + split * split_width
         ROI = image[y:y+h, split_index : split_index + split_width]
-        cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)
+        cv2.imwrite('character_{}.png'.format(ROI_number), ROI)
         ROI_number += 1
     return ROI_number
 
@@ -86,18 +86,16 @@ def determineTrainingData(image):
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
     cnts, _ = contours.sort_contours(cnts, method="left-to-right")
 
-    ROI_number = 0
+    ROI_number = 1
     for c in cnts:
         area = cv2.contourArea(c)
-        
         # print("Area is",area)
         if area >= 700 and area <= 9000: #add the right area values
-            ROI_number = split_multiple_characters(image,c,ROI_number,1)
             if area > 7000:
                 ROI_number = split_multiple_characters(image,c,ROI_number,5)
             elif area >= 5000 :
                 ROI_number = split_multiple_characters(image,c,ROI_number,4)
-            elif area >= 3300 :
+            elif area >= 3700 :
                 ROI_number = split_multiple_characters(image,c,ROI_number,3)
             elif area >= 2200:
                 ROI_number = split_multiple_characters(image,c,ROI_number,2)

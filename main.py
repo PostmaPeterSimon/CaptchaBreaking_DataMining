@@ -19,7 +19,7 @@ def main():
 
     erosion_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
     dilation_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
-    preprocess(image=random.choice(training_dataset), image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
+    preprocess(training_dataset[0], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
 
 if __name__ == "__main__":
     main()

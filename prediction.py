@@ -3,13 +3,12 @@ from preprocessing import *
 from sklearn.neighbors import KNeighborsClassifier
 
 # This function performs KNearestNeighborClassifier on preprocessed image.
-def Classifier(images,lables,a_metric):
-    preProcessedImages = []
-    for image in images:
-        preProcessedImages.append(preprocess(image))
-    d3array = np.array(preProcessedImages)
-    lables = np.array(lables)
+def trainingClassifier(images,lable,a_metric):
+    lables = []
+    d3array = np.array(images[0][:])
     nsamples, nx, ny = d3array.shape
+    for i in range (0,nsamples):
+        lables.append(lable)
     d2_train_dataset = d3array.reshape((nsamples,nx*ny))
     knn = KNeighborsClassifier(n_neighbors=5, p=2, weights='distance', algorithm='auto', metric=a_metric)
     knn.fit(d2_train_dataset,lables)

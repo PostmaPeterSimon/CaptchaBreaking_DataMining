@@ -3,6 +3,7 @@ import cv2
 import os
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
+from imutils import contours
 
 # The following function reads the folder with images.
 def load_images_from_folder(folder):
@@ -69,3 +70,15 @@ def preprocess(image, image_height, blur, dilation_kernel, erosion_kernel):
     cv2.waitKey(0)
     return end_image
 
+def determineTrainingData(image):
+    cnts = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #Tune cv2 parameters
+    cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+    cnts, _ = contours.sort_contours(cnts, method="left-to-right")
+
+    ROI_number = 0
+    for c in cnts:
+        area = cv2.contourArea(c)
+        if area > 1000 and area < 2000: #add the right area values
+            x,y,w,h = cv2.boundingRect(c)
+            ROI = 255 - image[y:y+h, x:x+w]
+            cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)

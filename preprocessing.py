@@ -51,7 +51,6 @@ def remove_noise(image):
 def preprocess(image, image_height, blur, dilation_kernel, erosion_kernel):
     #dilation kernel must of cv::MorphShapes 
     image = resize_image(image, image_height)
-    cv2.imshow('origional', image)
 
     # convert the image to grayscale format 
     imgray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -60,14 +59,12 @@ def preprocess(image, image_height, blur, dilation_kernel, erosion_kernel):
     noise_removed = remove_noise(tresh)
     
     dilation = cv2.dilate(noise_removed, dilation_kernel, iterations = 1)
-    cv2.imshow("dilation", dilation)
     erosion = cv2.erode(dilation, erosion_kernel, iterations = 1)
     
 
     cropped_image = crop_image(remove_noise(erosion))
     end_image = resize_image(cropped_image, image_height)
-    cv2.imshow('end_image', end_image)
-    cv2.waitKey(0)
+    determineTrainingData(end_image)
     return end_image
 
 def determineTrainingData(image):
@@ -78,7 +75,8 @@ def determineTrainingData(image):
     ROI_number = 0
     for c in cnts:
         area = cv2.contourArea(c)
-        if area > 1000 and area < 2000: #add the right area values
+        if area > 1000 and area < 4700: #add the right area values
             x,y,w,h = cv2.boundingRect(c)
             ROI = 255 - image[y:y+h, x:x+w]
             cv2.imwrite('ROI_{}.png'.format(ROI_number), ROI)
+            ROI_number +=1

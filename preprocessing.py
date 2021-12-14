@@ -4,6 +4,9 @@ import os
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 from imutils import contours
+import random
+
+listOfCharaters = []
 
 # The following function reads the folder with images.
 def load_images_from_folder(folder):
@@ -64,23 +67,18 @@ def preprocess(image, image_height, blur, dilation_kernel, erosion_kernel):
 
     cropped_image = crop_image(remove_noise(erosion))
     end_image = resize_image(cropped_image, image_height)
-    determineTrainingData(255 - end_image)
-    cv2.imshow("image",255 - end_image)
-    cv2.waitKey(0)
-    return end_image
+    return 255-end_image
 
-
+# This function splits one image into multiple images with one character
 def split_multiple_characters(image,c,ROI_number, n_characters):
     x,y,w,h = cv2.boundingRect(c)
     split_width = w//n_characters
     for split in range(0,n_characters):
         split_index = x + split * split_width
         ROI = image[y:y+h, split_index : split_index + split_width]
-        cv2.imwrite('character_{}.png'.format(ROI_number), ROI)
-        ROI_number += 1
-    return ROI_number
+        listOfCharaters.append(ROI)
 
-
+# This function contains settings for charater detection function.
 def determineTrainingData(image):
     cnts = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #Tune cv2 parameters
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
@@ -90,14 +88,26 @@ def determineTrainingData(image):
     for c in cnts:
         area = cv2.contourArea(c)
         # print("Area is",area)
-        if area >= 700 and area <= 9000: #add the right area values
+        if area >= 700 and area <= 9000: # We can adjust these values and see if it gives us any difference
             if area > 7000:
-                ROI_number = split_multiple_characters(image,c,ROI_number,5)
+                split_multiple_characters(image,c,ROI_number,5)
             elif area >= 5000 :
-                ROI_number = split_multiple_characters(image,c,ROI_number,4)
+                split_multiple_characters(image,c,ROI_number,4)
             elif area >= 3700 :
-                ROI_number = split_multiple_characters(image,c,ROI_number,3)
+                split_multiple_characters(image,c,ROI_number,3)
             elif area >= 2200:
-                ROI_number = split_multiple_characters(image,c,ROI_number,2)
+                split_multiple_characters(image,c,ROI_number,2)
             elif area >= 700:
-                ROI_number = split_multiple_characters(image,c,ROI_number,1)
+                split_multiple_characters(image,c,ROI_number,1)
+
+# This function filters obtained characters into folder for futher training. 
+def saveTrainingData(lable):
+    for i,l in enumerate(lable):
+        dirName = "t_data/"+l
+        if not os.path.exists(dirName):
+            os.makedirs(dirName)   
+        if i > len(listOfCharaters) -1:
+            return
+        else:
+            cv2.imwrite(os.path.join(dirName,'character_{}.png'.format(random.randint(0,999))),listOfCharaters[i])
+    listOfCharaters.clear()

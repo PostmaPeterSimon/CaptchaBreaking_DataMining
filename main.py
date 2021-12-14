@@ -1,6 +1,5 @@
 from preprocessing import *
 from prediction import *
-import random
 
 def main():
     score = []
@@ -19,7 +18,9 @@ def main():
 
     erosion_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
     dilation_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
-    preprocess(random.choice(training_dataset), image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
-
+    for i in range(0,len(training_dataset)):
+        processedImage = preprocess(training_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
+        determineTrainingData(processedImage)
+        saveTrainingData(training_lables[i])
 if __name__ == "__main__":
     main()

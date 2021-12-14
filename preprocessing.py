@@ -62,10 +62,10 @@ def preprocess(image, image_height, blur, dilation_kernel, erosion_kernel):
     erosion = cv2.erode(dilation, erosion_kernel, iterations = 1)
     
 
-    cropped_image = crop_image(255-remove_noise(erosion))
+    cropped_image = crop_image(remove_noise(erosion))
     end_image = resize_image(cropped_image, image_height)
-    determineTrainingData(end_image)
-    cv2.imshow("image",end_image)
+    determineTrainingData(255 - end_image)
+    cv2.imshow("image",255 - end_image)
     cv2.waitKey(0)
     return end_image
 
@@ -89,10 +89,17 @@ def determineTrainingData(image):
     ROI_number = 0
     for c in cnts:
         area = cv2.contourArea(c)
-        if area > 1000 and area < 4700: #add the right area values
-            if area > 4000:
+        
+        # print("Area is",area)
+        if area >= 700 and area <= 9000: #add the right area values
+            ROI_number = split_multiple_characters(image,c,ROI_number,1)
+            if area > 7000:
+                ROI_number = split_multiple_characters(image,c,ROI_number,5)
+            elif area >= 5000 :
+                ROI_number = split_multiple_characters(image,c,ROI_number,4)
+            elif area >= 3300 :
                 ROI_number = split_multiple_characters(image,c,ROI_number,3)
-            elif area > 1800:
+            elif area >= 2200:
                 ROI_number = split_multiple_characters(image,c,ROI_number,2)
-            else:
+            elif area >= 700:
                 ROI_number = split_multiple_characters(image,c,ROI_number,1)

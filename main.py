@@ -23,17 +23,12 @@ def main():
         for filename in os.listdir("t_data/"+lable):
             img = cv2.imread(os.path.join("t_data/"+lable,filename))
             if img is not None:
-                training_dataset.append(img,)
+                training_dataset.append(img)
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
 
     # for metric in ["euclidean", "minkowski", "manhattan", "seuclidean"]: #"seuclidean"
-    # model = trainingClassifier(training_dataset,training_lables,"euclidean") 
+    model = trainingClassifier(training_dataset,training_lables,"euclidean")
     # predict_Captha(test_dataset,test_lables,model)
-    
-
-
-
-
 if __name__ == "__main__":
     main()

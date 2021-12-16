@@ -70,13 +70,14 @@ def preprocess(image, image_height, blur, dilation_kernel, erosion_kernel):
     return 255-end_image
 
 # This function splits one image into multiple images with one character
-def split_multiple_characters(image,c,ROI_number, n_characters):
+def split_multiple_characters(image,c, n_characters):
     x,y,w,h = cv2.boundingRect(c)
     split_width = w//n_characters
     for split in range(0,n_characters):
         split_index = x + split * split_width
         ROI = image[y:y+h, split_index : split_index + split_width]
-        listOfCharaters.append(ROI)
+        resize_image = cv2.resize(ROI, (1000, 500),interpolation=cv2.INTER_AREA) 
+        listOfCharaters.append(resize_image)
 
 # This function contains settings for charater detection function.
 def determineTrainingData(image):
@@ -84,21 +85,20 @@ def determineTrainingData(image):
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
     cnts, _ = contours.sort_contours(cnts, method="left-to-right")
 
-    ROI_number = 1
     for c in cnts:
         area = cv2.contourArea(c)
         # print("Area is",area)
         if area >= 700 and area <= 9000: # We can adjust these values and see if it gives us any difference
             if area > 7000:
-                split_multiple_characters(image,c,ROI_number,5)
+                split_multiple_characters(image,c,5)
             elif area >= 5000 :
-                split_multiple_characters(image,c,ROI_number,4)
+                split_multiple_characters(image,c,4)
             elif area >= 3700 :
-                split_multiple_characters(image,c,ROI_number,3)
+                split_multiple_characters(image,c,3)
             elif area >= 2200:
-                split_multiple_characters(image,c,ROI_number,2)
+                split_multiple_characters(image,c,2)
             elif area >= 700:
-                split_multiple_characters(image,c,ROI_number,1)
+                split_multiple_characters(image,c,1)
 
 # This function filters obtained characters into folder for futher training. 
 def saveTrainingData(lable):
@@ -109,5 +109,5 @@ def saveTrainingData(lable):
         if i > len(listOfCharaters) -1:
             return
         else:
-            cv2.imwrite(os.path.join(dirName,'character_{}.png'.format(random.randint(0,999))),listOfCharaters[i])
+            cv2.imwrite(os.path.join(dirName,'character_{}.bmp'.format(random.randint(0,999))),listOfCharaters[i])
     listOfCharaters.clear()

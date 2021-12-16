@@ -13,9 +13,17 @@ def trainingClassifier(images,lables,a_metric):
     return knn
 
 def predict_Captha(knn):
-    d3array = np.array(listOfCharaters)
-    nsamples, nx, ny= d3array.shape
-    d2_test_dataset = d3array.reshape((nsamples,nx*ny))
-    prediction = knn.predict(d2_test_dataset)
-    listOfCharaters.clear()
-    return prediction
+    try:
+        d3array = np.array(listOfCharaters)
+        nsamples, nx, ny= d3array.shape
+        if nsamples == 5:
+            d2_test_dataset = d3array.reshape((nsamples,nx*ny))
+            prediction = knn.predict(d2_test_dataset)
+            listOfCharaters.clear()
+            return ''.join([str(elem) for elem in prediction])
+            # print("Not enough charaters to make the prediction")
+        listOfCharaters.clear()
+    except:
+        # print("Something went wrong")
+        return
+

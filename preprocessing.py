@@ -30,8 +30,6 @@ def resize_image(image, height):
     scale_percent =  image.shape[0] / height
     width = int(image.shape[1] / scale_percent)
     dsize = (width, height)
-    print("origional width, height :{}, {}".format(image.shape[1], image.shape[0]))
-    print(dsize)
     image = cv2.resize(image, dsize)
     return image
 
@@ -76,7 +74,7 @@ def split_multiple_characters(image,c, n_characters):
     for split in range(0,n_characters):
         split_index = x + split * split_width
         ROI = image[y:y+h, split_index : split_index + split_width]
-        resize_image = cv2.resize(ROI, (1000, 500),interpolation=cv2.INTER_AREA)
+        resize_image = cv2.resize(ROI, (100, 100),interpolation=cv2.INTER_AREA)
         listOfCharaters.append(resize_image)
 
 # This function contains settings for charater detection function.
@@ -87,7 +85,6 @@ def determineTrainingData(image):
 
     for c in cnts:
         area = cv2.contourArea(c)
-        # print("Area is",area)
         if area >= 700 and area <= 9000: # We can adjust these values and see if it gives us any difference
             if area > 7000:
                 split_multiple_characters(image,c,5)

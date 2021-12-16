@@ -1,5 +1,6 @@
 from preprocessing import *
 from prediction import *
+from sklearn.metrics import confusion_matrix
 
 def main():
     score = []
@@ -29,11 +30,11 @@ def main():
                 assert len(training_dataset)==len(training_lables)
 
     # for metric in ["euclidean", "minkowski", "manhattan", "seuclidean"]: #"seuclidean"
-    model = trainingClassifier(training_dataset,training_lables,"euclidean")
+    prediction = []
+    model = trainingClassifier(training_dataset,training_lables,"manhattan")
     for i in range(len(test_dataset)):
         processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
         determineTrainingData(processedTestImage)
-        prediction = predict_Captha(model)
-        print(prediction,test_lables[i])
+        prediction.append(predict_Captha(model))
 if __name__ == "__main__":
     main()

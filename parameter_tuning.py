@@ -19,10 +19,8 @@ class Classifier_score:
     metric: str = "N/A"
     n_neighbors: str = "N/A"
 
-    
 
-
-def get_training_data(image_height, blur_size, dilation_size, erosion_size):
+def set_training_data(image_height, blur_size, dilation_size, erosion_size):
     #TODO Delete previous training data
 
     blur_tuple = (blur_size, blur_size)
@@ -34,7 +32,7 @@ def get_training_data(image_height, blur_size, dilation_size, erosion_size):
     #TODO preprocess
     return #training_data
 
-def get_testing_data(image_height, blur_size, dilation_size, erosion_size):
+def set_testing_data(image_height, blur_size, dilation_size, erosion_size):
     #TODO Delete previous test data 
 
     blur_tuple = (blur_size, blur_size)
@@ -58,7 +56,7 @@ def score_mlp_classifier():
     #test Classifier
     return accuracy
 
-def tune_and_score_classifiers(classifier):
+def tune_and_score_classifiers(Classifier):
     ## Preprocessing: ##
     range_blur_size = range(1, 16)
     range_dilation_size = range(1, 16)
@@ -77,8 +75,8 @@ def tune_and_score_classifiers(classifier):
     for blur_size in range_blur_size:
         for dilation_size in range_dilation_size:
             for erosion_size in range_erosion_size:
-                train_data = get_training_data(image_height, blur_size, dilation_size, erosion_size)
-                test_data = get_testing_data(image_height, blur_size, dilation_size, erosion_size)
+                train_data = set_training_data(image_height, blur_size, dilation_size, erosion_size)
+                test_data = set_testing_data(image_height, blur_size, dilation_size, erosion_size)
 
                 if classifier == Classifiers.K_NEAREST_NEIGHBOUR:
                     for metric in k_nearest_neighbour_metrics:

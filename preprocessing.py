@@ -76,7 +76,7 @@ def split_multiple_characters(image,c, n_characters):
     for split in range(0,n_characters):
         split_index = x + split * split_width
         ROI = image[y:y+h, split_index : split_index + split_width]
-        resize_image = cv2.resize(ROI, (1000, 500),interpolation=cv2.INTER_AREA) 
+        resize_image = cv2.resize(ROI, (1000, 500),interpolation=cv2.INTER_AREA)
         listOfCharaters.append(resize_image)
 
 # This function contains settings for charater detection function.

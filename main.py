@@ -44,12 +44,11 @@ def main():
             fp +=i
             #     prediction.append(predict_Captha(model))
             # print(prediction)
-        print("Confusion Matrix:")
+        print("Confusion Matrix for "+metric+" method:")
         print(tp,'|',fn )
         print(fp,'|',tn )
         accuracy = (tp+tn)/(tp+fn+fp+tn)
         print("Accuracy is:",accuracy )
-        prediction.append([metric,accuracy])
-    print(prediction)
+        print("                ")
 if __name__ == "__main__":
     main()

@@ -27,3 +27,26 @@ def predict_Captha(knn):
         # print("Something went wrong")
         return
 
+def getConfusionMatrix(knn,lable):
+    try:
+        correct =0
+        incorrect = 0
+        d3array = np.array(listOfCharaters)
+        nsamples, nx, ny= d3array.shape
+        d2_test_dataset = d3array.reshape((nsamples,nx*ny))
+        prediction = knn.predict(d2_test_dataset)
+        listOfCharaters.clear()
+        string = ''.join([str(elem) for elem in prediction])
+        for i,l in enumerate(lable):
+            try:
+                c = string[i]
+            except:
+                c = None
+            if c == l:
+                correct+=1
+            else:
+                incorrect+=1
+        return correct,incorrect
+    except:
+        return 0,5
+

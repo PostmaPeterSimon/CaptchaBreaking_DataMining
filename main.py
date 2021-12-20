@@ -29,12 +29,27 @@ def main():
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
 
-    # for metric in ["euclidean", "minkowski", "manhattan", "seuclidean"]: #"seuclidean"
-    prediction = []
-    model = trainingClassifier(training_dataset,training_lables,"manhattan")
-    for i in range(len(test_dataset)):
-        processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
-        determineTrainingData(processedTestImage)
-        prediction.append(predict_Captha(model))
+    for metric in ["euclidean", "minkowski", "manhattan"]: #"seuclidean"
+        prediction = []
+        tp = 0
+        fn = 0
+        tn = 0
+        fp = 0
+        model = trainingClassifier(training_dataset,training_lables,metric)
+        for i in range(len(test_dataset)):
+            processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
+            determineTrainingData(processedTestImage)
+            c,i = getConfusionMatrix(model,test_lables[i])
+            tp +=c
+            fp +=i
+            #     prediction.append(predict_Captha(model))
+            # print(prediction)
+        print("Confusion Matrix:")
+        print(tp,'|',fn )
+        print(fp,'|',tn )
+        accuracy = (tp+tn)/(tp+fn+fp+tn)
+        print("Accuracy is:",accuracy )
+        prediction.append([metric,accuracy])
+    print(prediction)
 if __name__ == "__main__":
     main()

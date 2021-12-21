@@ -15,18 +15,26 @@ class Classifiers(Enum):
       MLP_CLASSIFIER = 2
       SVM_CLASSIFIER = 3
 
-@dataclass
 class Classifier_score:
-    classifier: Classifiers
-    blur: int
-    dilation: int
-    erosion: int
-    accuracy: float
-    metric: str = ""
-    n_neighbors: str = ""
-    kernel: str = ""
-    degrees: int = 0
-    nu: float = 0
+    def __init__(self, classifier, cf_matrix, blur, dilation, erosion, metric=None, \
+                n_neighbors=None, kernel=None, degrees=None, nu=None):
+        self.classifier = classifier
+        self.matrix = cf_matrix
+        self.blur = blur
+        self.dilation = dilation
+        self.erosion = erosion
+        self.accuracy = self._calculate_accuracy()
+        self.error = 1-self.accuracy
+        self.metric = None if metric == None else metric
+        self.n_neighbors = None if n_neighbors == None else n_neighbors
+        self.kernel = None if kernel == None else kernel
+        self.degrees = None if degrees == None else degrees
+        self.nu = None if nu == None else nu
+
+    #Pre: matrix should be set
+    def _calculate_accuracy(self):
+        matrix = self.matrix
+        #TODO calcualte accuracy
 
 
 def set_training_data(image_height, blur_size, dilation_size, erosion_size):
@@ -145,4 +153,5 @@ def tune_and_score_classifiers(classifier):
                                         svm_nu=svm_nu, svm_degree=svm_degree)
                                     scores.append(Classifier_score(Classifiers.MLP_CLASSIFIER, blur = blur_size,\
                                                 dilation = dilation_size, erosion = erosion_size, cf_matrix=cf_matrix))
-        
+    
+    return scores

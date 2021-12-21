@@ -52,11 +52,15 @@ def main():
         print("Accuracy is:",accuracy )
         print("                ")
 
-def test_svm():
-    tune_and_score_classifiers(Classifiers.SVM_CLASSIFIER)
+def new_main():
+    knn_scores = tune_and_score_classifiers(Classifiers.K_NEAREST_NEIGHBOUR)
+    svm_scores = tune_and_score_classifiers(Classifiers.SVM_CLASSIFIER)
+    minimum_knn_error = min(knn_scores, key=attrgetter('error'))
+
+
 
 if __name__ == "__main__":
     # main()
-    test_svm()
+    new_main()
 
 

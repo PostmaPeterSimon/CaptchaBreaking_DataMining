@@ -3,8 +3,9 @@ import numpy as np
 from preprocessing import *
 from sklearn.neighbors import KNeighborsClassifier
 
+
 # This function performs KNearestNeighborClassifier on preprocessed image.
-def trainingClassifier(images,lables,a_metric, n_neighbors=None):
+def trainingClassifier(images, lables, a_metric, n_neighbors=None):
     if n_neighbors == None:
         n_neighbors = 5
 
@@ -61,4 +62,3 @@ def getConfusionMatrix(knn,lable):
         return correct,incorrect
     except:
         return 0,5
-

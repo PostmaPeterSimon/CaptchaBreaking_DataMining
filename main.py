@@ -1,5 +1,6 @@
 from preprocessing import *
 from prediction import *
+from parameter_tuning import *
 from sklearn.metrics import confusion_matrix
 
 def main():
@@ -29,7 +30,7 @@ def main():
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
 
-    for metric in ["euclidean", "minkowski", "manhattan", "seuclidean"]:
+    for metric in [ "euclidean", "minkowski", "manhattan", "seuclidean"]:
         prediction = []
         tp = 0
         fn = 0
@@ -51,5 +52,11 @@ def main():
         print("Accuracy is:",accuracy )
         print("                ")
 
+def test_svm():
+    tune_and_score_classifiers(Classifiers.SVM_CLASSIFIER)
+
 if __name__ == "__main__":
-    main()
+    # main()
+    test_svm()
+
+

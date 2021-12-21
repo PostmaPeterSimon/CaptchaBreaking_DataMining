@@ -1,7 +1,6 @@
 from preprocessing import *
 from prediction import *
 from parameter_tuning import *
-from sklearn.metrics import confusion_matrix
 
 def main():
     score = []
@@ -30,37 +29,23 @@ def main():
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
 
-    for metric in [ "euclidean", "minkowski", "manhattan", "seuclidean"]:
+    for metric in ["euclidean","minkowski", "manhattan", "seuclidean"]:
         prediction = []
-        tp = 0
-        fn = 0
-        tn = 0
-        fp = 0
+
         model = trainingClassifier(training_dataset,training_lables,metric)
         for i in range(len(test_dataset)):
             processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
             determineTrainingData(processedTestImage)
-            c,i = getConfusionMatrix(model,test_lables[i])
-            tp +=c
-            fp +=i
-            #     prediction.append(predict_Captha(model))
-            # print(prediction)
-        print("Confusion Matrix for "+metric+" method:")
-        print(tp,'|',fn )
-        print(fp,'|',tn )
-        accuracy = (tp+tn)/(tp+fn+fp+tn)
-        print("Accuracy is:",accuracy )
-        print("                ")
+            prediction.append(predict_Captha(model))
+        makeConfusionMatrix(prediction,test_lables)
 
-def new_main():
-    knn_scores = tune_and_score_classifiers(Classifiers.K_NEAREST_NEIGHBOUR)
-    svm_scores = tune_and_score_classifiers(Classifiers.SVM_CLASSIFIER)
-    minimum_knn_error = min(knn_scores, key=attrgetter('error'))
-
-
+# def new_main():
+#     knn_scores = tune_and_score_classifiers(Classifiers.K_NEAREST_NEIGHBOUR)
+#     svm_scores = tune_and_score_classifiers(Classifiers.SVM_CLASSIFIER)
+#     minimum_knn_error = min(knn_scores, key=attrgetter('error'))
 
 if __name__ == "__main__":
-    # main()
-    new_main()
+    main()
+    # new_main()
 
 

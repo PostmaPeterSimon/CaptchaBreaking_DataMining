@@ -2,6 +2,10 @@ from cv2 import Algorithm
 import numpy as np
 from preprocessing import *
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn import metrics
+import seaborn as sn
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 # This function performs KNearestNeighborClassifier on preprocessed image.
@@ -40,25 +44,39 @@ def predict_Captha(knn):
         # print("Something went wrong")
         return
 
-def getConfusionMatrix(knn,lable):
+def predict_Captha(knn):
     try:
-        correct =0
-        incorrect = 0
         d3array = np.array(listOfCharaters)
         nsamples, nx, ny= d3array.shape
-        d2_test_dataset = d3array.reshape((nsamples,nx*ny))
-        prediction = knn.predict(d2_test_dataset)
+        if nsamples == 5:
+            d2_test_dataset = d3array.reshape((nsamples,nx*ny))
+            prediction = knn.predict(d2_test_dataset)
+            listOfCharaters.clear()
+            return ''.join([str(elem) for elem in prediction])
+            # print("Not enough charaters to make the prediction")
         listOfCharaters.clear()
-        string = ''.join([str(elem) for elem in prediction])
-        for i,l in enumerate(lable):
-            try:
-                c = string[i]
-            except:
-                c = None
-            if c == l:
-                correct+=1
-            else:
-                incorrect+=1
-        return correct,incorrect
+        return "     "
     except:
-        return 0,5
+        # print("Something went wrong")
+        return "     "
+
+def plot_confusion_matrix(cm,y):
+    df_cm = pd.DataFrame(cm, index = [i+1 for i in np.unique(y)],columns = [i+1 for i in np.unique(y)])
+    plt.figure()
+    sn.heatmap(df_cm, annot=True)
+    plt.title('Confusion matrix')
+    plt.xlabel('Predicted class')
+    plt.ylabel('Actual class')
+    plt.show()
+
+def makeConfusionMatrix(prediction,lables):
+    p_char = []
+    l_char = []
+    for i,string in enumerate(prediction):
+        for y,char in enumerate(string):
+            p_char.append(ord(char))
+            l_char.append(ord(lables[i][y]))
+    l_char.append(ord(" "))
+    p_char.append(ord(" "))
+    confusion_matrix = metrics.confusion_matrix(l_char, p_char)
+    plot_confusion_matrix(confusion_matrix,l_char)

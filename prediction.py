@@ -1,14 +1,26 @@
+from cv2 import Algorithm
 import numpy as np
 from preprocessing import *
 from sklearn.neighbors import KNeighborsClassifier
 
 # This function performs KNearestNeighborClassifier on preprocessed image.
-def trainingClassifier(images,lables,a_metric):
+def trainingClassifier(images,lables,a_metric, n_neighbors=None):
+    if n_neighbors == None:
+        n_neighbors = 5
+
     d3array = np.array(images)
     dlable = np.array(lables)
     nsamples, nx, ny= d3array.shape
     d2_train_dataset = d3array.reshape((nsamples,nx*ny))
-    knn = KNeighborsClassifier(n_neighbors=5, p=2, weights='distance', algorithm='auto', metric=a_metric)
+    knn = None
+    if a_metric == 'seuclidean':
+        V = {'V' : np.var(d2_train_dataset, axis=0)}
+        knn = KNeighborsClassifier(metric='seuclidean', metric_params=V, \
+            n_neighbors=n_neighbors, algorithm='auto', p=2, weights='distance')
+    else:
+        knn = KNeighborsClassifier(metric=a_metric, n_neighbors=n_neighbors, \
+            p=2, algorithm='auto', weights='distance')
+
     knn.fit(d2_train_dataset,lables)
     return knn
 

@@ -29,7 +29,7 @@ def main():
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
 
-    for metric in ["euclidean", "minkowski", "manhattan"]: #"seuclidean"
+    for metric in ["euclidean", "minkowski", "manhattan", "seuclidean"]:
         prediction = []
         tp = 0
         fn = 0
@@ -50,5 +50,6 @@ def main():
         accuracy = (tp+tn)/(tp+fn+fp+tn)
         print("Accuracy is:",accuracy )
         print("                ")
+
 if __name__ == "__main__":
     main()

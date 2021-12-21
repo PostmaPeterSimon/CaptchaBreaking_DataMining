@@ -56,7 +56,7 @@ def score_mlp_classifier():
     #test Classifier
     return accuracy
 
-def tune_and_score_classifiers(Classifier):
+def tune_and_score_classifiers(classifier):
     ## Preprocessing: ##
     range_blur_size = range(1, 16)
     range_dilation_size = range(1, 16)

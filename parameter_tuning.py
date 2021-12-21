@@ -1,6 +1,8 @@
 from enum import Enum
 from dataclasses import dataclass
 import numpy as np
+import sys
+import shutil
 
 from preprocessing import *
 from prediction import *
@@ -21,32 +23,49 @@ class Classifier_score:
 
 
 def set_training_data(image_height, blur_size, dilation_size, erosion_size):
-    #TODO Delete previous training data
-
+    training_dataset = load_images_from_folder("data/training")
+    training_lables = get_captha_lable("data/training")
     blur_tuple = (blur_size, blur_size)
     dilation_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (dilation_size, dilation_size))
     erosion_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (erosion_size, erosion_size))
 
-    #determine_training_data
+    if os.path.exists("t_data"):
+        shutil.rmtree("t_data")
 
-    #TODO preprocess
-    return #training_data
+    for i in range(len(training_dataset)):
+        processedImage = preprocess(training_dataset[i], image_height=image_height, blur=blur_tuple, \
+                dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
+        determineTrainingData(processedImage)
+        saveTrainingData(training_lables[i])
 
-def set_testing_data(image_height, blur_size, dilation_size, erosion_size):
-    #TODO Delete previous test data 
+    training_dataset.clear()
+    training_lables.clear()
+    for lable in os.listdir("t_data"):
+        for filename in os.listdir("t_data/"+lable):
+            img = cv2.imread(os.path.join("t_data/"+lable,filename),cv2.IMREAD_GRAYSCALE)
+            if img is not None:
+                training_dataset.append(img)
+                training_lables.append(lable)
+                assert len(training_dataset)==len(training_lables)
 
-    blur_tuple = (blur_size, blur_size)
-    dilation_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (dilation_size, dilation_size))
-    erosion_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (erosion_size, erosion_size))
-    
-    # TODO preprocess
-    return #testing_data
+    return training_dataset, training_lables
 
-def score_k_nearest_neighbour_classifier(metric, n_neighbours):
+
+def score_k_nearest_neighbour_classifier(training_dataset, training_lables, metric, n_neighbors, \
+        image_height, blur_size, dilation_size, erosion_size ):
     accuracy = None
-    #train Classifier
+    blur_tuple = (blur_size, blur_size)
+    dilation_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (dilation_size, dilation_size))
+    erosion_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (erosion_size, erosion_size))
+    test_dataset = load_images_from_folder("data/test")
+    test_lables = get_captha_lable("data/test")
+    trained_classifier = trainingClassifier(training_dataset, training_lables, metric, n_neighbors)
 
-    #test Classifier
+    for testimage in test_dataset:
+        processedTestImage = preprocess(testimage, image_height=image_height, blur=blur_tuple, \
+            dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
+        determineTrainingData(processedTestImage)
+
     return accuracy
 
 def score_mlp_classifier():
@@ -75,15 +94,16 @@ def tune_and_score_classifiers(classifier):
     for blur_size in range_blur_size:
         for dilation_size in range_dilation_size:
             for erosion_size in range_erosion_size:
-                train_data = set_training_data(image_height, blur_size, dilation_size, erosion_size)
-                test_data = set_testing_data(image_height, blur_size, dilation_size, erosion_size)
+                training_dataset, training_lables = set_training_data(image_height, blur_size, dilation_size, erosion_size)
 
                 if classifier == Classifiers.K_NEAREST_NEIGHBOUR:
                     for metric in k_nearest_neighbour_metrics:
                         for n_neighbours in range_n_neighbours:
-                            accuracy = score_k_nearest_neighbour_classifier(train_data, test_data, metric, n_neighbours)
+                            accuracy = score_k_nearest_neighbour_classifier(training_dataset, training_lables, \
+                                 metric, n_neighbours, image_height, blur_size, dilation_size, erosion_size)
                             scores.append(Classifier_score(classifier=Classifiers.K_NEAREST_NEIGHBOUR, blur = blur_size,\
-                                dilation = dilation_size, erosion = erosion_size, metric = metric, n_neighbours = n_neighbours, accuracy = accuracy))
+                                dilation = dilation_size, erosion = erosion_size, metric = metric, \
+                                n_neighbours = n_neighbours, accuracy = accuracy))
 
                 elif classifier == Classifiers.MLP_CLASSIFIER:
                     accuracy = score_mlp_classifier(train_data, test_data)

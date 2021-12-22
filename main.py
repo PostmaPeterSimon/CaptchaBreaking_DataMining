@@ -1,3 +1,4 @@
+from numpy import printoptions
 from preprocessing import *
 from prediction import *
 from parameter_tuning import *
@@ -29,25 +30,26 @@ def main():
                 training_dataset.append(img)
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
-    score.append("KNN")
+        score.append("KNN with "+str(10)+" neighbor")
     for metric in ["euclidean","minkowski", "manhattan", "seuclidean"]:
         prediction = []
-        model = trainingClassifier(training_dataset,training_lables,metric,2)
+        model = trainingClassifier(training_dataset,training_lables,metric,10)
         for i in range(len(test_dataset)):
             processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
             determineTrainingData(processedTestImage)
             prediction.append(predict_Captha(model))
-        score.append(makeConfusionMatrix(prediction,test_lables,metric))
-    score.append("SVM")
+        score.append(makeConfusionMatrix(prediction,test_lables,metric,False))
+    score.append("SVM with "+str(3)+" degrees")
     for svm_kernels in ["linear", "poly", "rbf", "sigmoid"]: # "precomputed"
         prediction = [] 
-        model = trainingSVM(training_dataset,training_lables,svm_kernels)
+        model = trainingSVM(training_dataset,training_lables,svm_kernels,3)
         for i in range(len(test_dataset)):
             processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
             determineTrainingData(processedTestImage)
             prediction.append(predict_Captha(model))
-        score.append(makeConfusionMatrix(prediction,test_lables,svm_kernels))
+        score.append(makeConfusionMatrix(prediction,test_lables,svm_kernels,False))
     print(score)
+    print(max(score))
 
 def tuning_run():
     knn_scores = tune_and_score_classifiers(Classifiers.K_NEAREST_NEIGHBOUR)

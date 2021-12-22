@@ -96,7 +96,7 @@ def plot_confusion_matrix(cm,y,metric):
     plt.savefig('confusion_matrix_'+metric+'.png', format='png')
     plt.close(fig)
 
-def makeConfusionMatrix(prediction,lables,metric):
+def makeConfusionMatrix(prediction,lables,metric,plot_flag):
     p_char = []
     l_char = []
     for i,string in enumerate(prediction):
@@ -106,14 +106,15 @@ def makeConfusionMatrix(prediction,lables,metric):
     l_char.append(ord(" "))
     p_char.append(ord(" "))
     confusion_matrix = metrics.confusion_matrix(l_char, p_char)
-    plot_confusion_matrix(confusion_matrix,l_char,metric)
+    if plot_flag:
+        plot_confusion_matrix(confusion_matrix,l_char,metric)
     return calculate_matrix_accuracy(confusion_matrix,len(l_char))
 
-def trainingSVM(training_dataset,training_lables,svm_kernel):
+def trainingSVM(training_dataset,training_lables,svm_kernel,degrees):
     training_dataset_as_np_array = np.array(training_dataset)
     nsamples, nx, ny= training_dataset_as_np_array.shape
     training_dataset_as_2d = training_dataset_as_np_array.reshape((nsamples,nx*ny))
-    clf = make_pipeline(StandardScaler(), NuSVC(nu=0.4, kernel=svm_kernel,degree=3))
+    clf = make_pipeline(StandardScaler(), NuSVC(nu=0.4, kernel=svm_kernel,degree=degrees))
     return clf.fit(training_dataset_as_2d, training_lables)
 
 def score_svm_classifier(training_dataset, training_lables,svm_kernel, svm_nu, svm_degree,dilation_size, erosion_size,image_height, blur_size):

@@ -109,6 +109,7 @@ def score_svm_classifier(training_dataset, training_lables, svm_nu, svm_kernel, 
     #Testing SVM
     cf_matrix = None
     #TODO classify test data, get confusion matrix
+    #TODO test_data should probably made 2d as well.
     return cf_matrix
 
 

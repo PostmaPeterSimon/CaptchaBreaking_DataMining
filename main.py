@@ -1,6 +1,7 @@
 from preprocessing import *
 from prediction import *
 from parameter_tuning import *
+from operator import attrgetter
 
 def main():
     score = []
@@ -28,24 +29,37 @@ def main():
                 training_dataset.append(img)
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
-
+    score.append("KNN")
     for metric in ["euclidean","minkowski", "manhattan", "seuclidean"]:
         prediction = []
-
-        model = trainingClassifier(training_dataset,training_lables,metric)
+        model = trainingClassifier(training_dataset,training_lables,metric,2)
         for i in range(len(test_dataset)):
             processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
             determineTrainingData(processedTestImage)
             prediction.append(predict_Captha(model))
-        makeConfusionMatrix(prediction,test_lables)
+        score.append(makeConfusionMatrix(prediction,test_lables,metric))
+    score.append("SVM")
+    for svm_kernels in ["linear", "poly", "rbf", "sigmoid"]: # "precomputed"
+        prediction = [] 
+        model = trainingSVM(training_dataset,training_lables,svm_kernels)
+        for i in range(len(test_dataset)):
+            processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
+            determineTrainingData(processedTestImage)
+            prediction.append(predict_Captha(model))
+        score.append(makeConfusionMatrix(prediction,test_lables,svm_kernels))
+    print(score)
 
-# def new_main():
-#     knn_scores = tune_and_score_classifiers(Classifiers.K_NEAREST_NEIGHBOUR)
-#     svm_scores = tune_and_score_classifiers(Classifiers.SVM_CLASSIFIER)
-#     minimum_knn_error = min(knn_scores, key=attrgetter('error'))
-
+def tuning_run():
+    knn_scores = tune_and_score_classifiers(Classifiers.K_NEAREST_NEIGHBOUR)
+    svm_scores = tune_and_score_classifiers(Classifiers.SVM_CLASSIFIER)
+    minimum_knn_error = min(knn_scores, key=attrgetter('error'))
+    minimum_svm_error = min(svm_scores, key=attrgetter('error'))
+    print(knn_scores)
+    print("The best knn is",minimum_knn_error)
+    print(svm_scores)
+    print("The best svm is",minimum_svm_error)
 if __name__ == "__main__":
     main()
-    # new_main()
+    # tuning_run()
 
 

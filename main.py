@@ -1,4 +1,3 @@
-from numpy import printoptions
 from preprocessing import *
 from prediction import *
 from parameter_tuning import *
@@ -6,6 +5,9 @@ from operator import attrgetter
 
 def main():
     score = []
+    number_of_neibors= 2
+    degrees = 3
+    matrix_flag = False
     training_dataset = load_images_from_folder("data/training")
     training_lables = get_captha_lable("data/training")
     test_dataset = load_images_from_folder("data/test")
@@ -30,26 +32,25 @@ def main():
                 training_dataset.append(img)
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
-        score.append("KNN with "+str(10)+" neighbor")
+    score.append("KNN with "+str(number_of_neibors)+" neighbor")
     for metric in ["euclidean","minkowski", "manhattan", "seuclidean"]:
         prediction = []
-        model = trainingClassifier(training_dataset,training_lables,metric,10)
+        model = trainingClassifier(training_dataset,training_lables,metric,number_of_neibors)
         for i in range(len(test_dataset)):
             processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
             determineTrainingData(processedTestImage)
             prediction.append(predict_Captha(model))
-        score.append(makeConfusionMatrix(prediction,test_lables,metric,False))
-    score.append("SVM with "+str(3)+" degrees")
+        score.append(makeConfusionMatrix(prediction,test_lables,metric,matrix_flag))
+    score.append("SVM with "+str(degrees)+" degrees")
     for svm_kernels in ["linear", "poly", "rbf", "sigmoid"]: # "precomputed"
         prediction = [] 
-        model = trainingSVM(training_dataset,training_lables,svm_kernels,3)
+        model = trainingSVM(training_dataset,training_lables,svm_kernels,degrees)
         for i in range(len(test_dataset)):
             processedTestImage = preprocess(test_dataset[i], image_height=100, blur=(5,5), dilation_kernel=dilation_kernel, erosion_kernel=erosion_kernel)
             determineTrainingData(processedTestImage)
             prediction.append(predict_Captha(model))
-        score.append(makeConfusionMatrix(prediction,test_lables,svm_kernels,False))
+        score.append(makeConfusionMatrix(prediction,test_lables,svm_kernels,matrix_flag))
     print(score)
-    print(max(score))
 
 def tuning_run():
     knn_scores = tune_and_score_classifiers(Classifiers.K_NEAREST_NEIGHBOUR)

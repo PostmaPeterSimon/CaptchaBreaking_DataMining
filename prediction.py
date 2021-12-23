@@ -63,7 +63,7 @@ def predict_Captha(knn):
         else:
             for i in range(add_Dummy):
                 listOfCharaters.append(' ')
-        d3array = np.array(listOfCharaters)
+        d3array = np.array(listOfCharaters,dtype=object)
         nsamples, nx, ny= d3array.shape
         assert nsamples == 5
         d2_test_dataset = d3array.reshape((nsamples,nx*ny))

@@ -114,7 +114,7 @@ def trainingSVM(training_dataset,training_lables,svm_kernel,degrees):
     training_dataset_as_np_array = np.array(training_dataset)
     nsamples, nx, ny= training_dataset_as_np_array.shape
     training_dataset_as_2d = training_dataset_as_np_array.reshape((nsamples,nx*ny))
-    clf = make_pipeline(StandardScaler(), NuSVC(nu=0.4, kernel=svm_kernel,degree=degrees))
+    clf = make_pipeline(StandardScaler(), NuSVC(nu=0.1, kernel=svm_kernel,degree=degrees))
     return clf.fit(training_dataset_as_2d, training_lables)
 
 def score_svm_classifier(training_dataset, training_lables,svm_kernel, svm_nu, svm_degree,dilation_size, erosion_size,image_height, blur_size):

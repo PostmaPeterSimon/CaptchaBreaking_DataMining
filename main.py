@@ -5,9 +5,9 @@ from operator import attrgetter
 
 def main():
     score = []
-    number_of_neibors= 2
-    degrees = 3
-    matrix_flag = False
+    number_of_neibors= 4
+    degrees = 2
+    matrix_flag = True
     training_dataset = load_images_from_folder("data/training")
     training_lables = get_captha_lable("data/training")
     test_dataset = load_images_from_folder("data/test")
@@ -15,7 +15,7 @@ def main():
     erosion_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
     dilation_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
 
-    # Make sure the we don't execute training data generation several times
+    # Make sure that we don't execute training data generation several times
     if not os.path.exists("t_data"):  
 
         for i in range(len(training_dataset)):
@@ -33,7 +33,7 @@ def main():
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
     score.append("KNN with "+str(number_of_neibors)+" neighbor")
-    for metric in ["euclidean","minkowski", "manhattan", "seuclidean"]:
+    for metric in ["manhattan"]: # minkowski
         prediction = []
         model = trainingClassifier(training_dataset,training_lables,metric,number_of_neibors)
         for i in range(len(test_dataset)):
@@ -42,7 +42,7 @@ def main():
             prediction.append(predict_Captha(model))
         score.append(makeConfusionMatrix(prediction,test_lables,metric,matrix_flag))
     score.append("SVM with "+str(degrees)+" degrees")
-    for svm_kernels in ["linear", "poly", "rbf", "sigmoid"]: # "precomputed"
+    for svm_kernels in ["poly"]: # "precomputed"
         prediction = [] 
         model = trainingSVM(training_dataset,training_lables,svm_kernels,degrees)
         for i in range(len(test_dataset)):
@@ -61,8 +61,9 @@ def tuning_run():
     print("The best knn is",minimum_knn_error)
     print(svm_scores)
     print("The best svm is",minimum_svm_error)
+
 if __name__ == "__main__":
     main()
-    # tuning_run()
+    # tuning_run() #Only theoretically but in fact takes a lot of time to finish.
 
 

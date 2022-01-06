@@ -5,7 +5,7 @@ from operator import attrgetter
 
 def main():
     score = []
-    number_of_neibors= 4
+    number_of_neibors= 7
     degrees = 2
     matrix_flag = True
     training_dataset = load_images_from_folder("data/training")
@@ -33,7 +33,7 @@ def main():
                 training_lables.append(lable)
                 assert len(training_dataset)==len(training_lables)
     score.append("KNN with "+str(number_of_neibors)+" neighbor")
-    for metric in ["manhattan"]: # minkowski
+    for metric in ["minkowski"]: # minkowski, manhattan
         prediction = []
         model = trainingClassifier(training_dataset,training_lables,metric,number_of_neibors)
         for i in range(len(test_dataset)):

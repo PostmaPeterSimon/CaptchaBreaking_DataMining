@@ -87,7 +87,7 @@ def calculate_matrix_accuracy(matrix, lables):
     return sum_correctly_classified / lables
 
 def plot_confusion_matrix(cm,y,metric):
-    df_cm = pd.DataFrame(cm, index = [i+1 for i in np.unique(y)],columns = [i+1 for i in np.unique(y)])
+    df_cm = pd.DataFrame(cm, index = [i+0 for i in np.unique(y)],columns = [i+0 for i in np.unique(y)])
     fig = plt.figure()
     sn.heatmap(df_cm, annot=True)
     plt.title('Confusion matrix_'+metric)
